@@ -1,0 +1,12 @@
+{
+  "id": "import-from-wordpress",
+  "name": "从 WordPress 导入",
+  "version": "1.0.0",
+  "description": "从 WordPress WXR 导出 XML 导入文章、媒体、用户、分类、评论与站点信息；保留现有数据、覆盖冲突。",
+  "author": "LinearPress",
+  "type": "backend",
+  "main": "index.ts",
+  "runtime": "cordis",
+  "views": "views",
+  "permissions": []
+}

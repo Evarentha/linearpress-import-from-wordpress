@@ -1,0 +1,134 @@
+<!--
+  Author: MoyuZJ
+  Team: LinearTeam
+  Contact: linearteam@foxmail.com
+  Made by MoyuZJ in China with ♥
+  从 WordPress 导入 · 导入进度页（仅发起者会话可见；其余访客看到普通维护首页）。
+-->
+<% layout = false %><!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>维护模式 · 正在导入数据</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f0f0f; color: #eee; font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { max-width: 680px; width: 100%; }
+  .eyebrow { font-size: 11px; letter-spacing: .18em; color: #888; text-transform: uppercase; margin: 0 0 14px; }
+  h1 { font: 400 clamp(26px, 5vw, 44px) Georgia, serif; margin: 0 0 8px; line-height: 1.15; }
+  h1 em { font-style: normal; color: #ffd479; }
+  .sub { color: #999; font-size: 14px; margin: 0 0 26px; }
+  .panel { border: 1px solid #333; background: #161616; padding: 22px 24px; margin: 0 0 18px; }
+  .tasks { list-style: none; margin: 0; padding: 0; }
+  .tasks li { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid #262626; padding: 12px 0; font-size: 14px; }
+  .tasks li:last-child { border-bottom: 0; }
+  .tasks li em { font-style: normal; color: #7bc47f; font-size: 12px; }
+  .tasks .bar { flex: 0 0 46%; height: 8px; background: #2a2a2a; border-radius: 99px; overflow: hidden; }
+  .tasks .bar i { display: block; height: 100%; background: #ffd479; transition: width .4s; }
+  .hint { color: #9a9a9a; font-size: 12.5px; margin: 0; }
+  .actions { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+  .actions .btn { border: 1px solid #444; background: #1c1c1c; color: #ddd; padding: 10px 22px; border-radius: 8px; cursor: default; font-size: 14px; min-width: 120px; }
+  .actions .btn.done { border-color: #3d7a46; color: #9ce0a3; }
+  .actions .btn.failed { border-color: #a33; color: #ff9f9f; }
+  .actions .span { color: #888; font-size: 13px; }
+  .note { border-left: 3px solid #ffd479; background: #1e1b12; padding: 14px 18px; font-size: 13.5px; line-height: 1.8; color: #e8dcbd; white-space: pre-line; }
+  .note.error { border-color: #a33; background: #241515; color: #ffc9c9; }
+</style>
+</head>
+<body>
+<main class="card">
+  <p class="eyebrow">MAINTENANCE MODE&nbsp;·&nbsp;IMPORT FROM WORDPRESS</p>
+  <h1>维护模式 <em>正在导入数据...</em></h1>
+  <p class="sub" id="sub">导入期间前台暂不可用，其他访客将看到普通维护首页。请勿关闭此页面。</p>
+
+  <section class="panel">
+    <ul class="tasks" id="tasks">
+      <% state.tasks.forEach(task => { %>
+        <li>
+          <span><%= task.label %></span>
+          <% if (task.done) { %><em>完成</em><% } else { %><div class="bar"><i style="width:<%= Math.max(0, Math.min(100, task.progress)) %>%"></i></div><% } %>
+        </li>
+      <% }) %>
+      <% if (!state.tasks.length) { %><li><span>准备中…</span><div class="bar"></div></li><% } %>
+    </ul>
+  </section>
+
+  <div class="actions">
+    <button class="btn" id="ctl"><%= state.running ? '导入中...' : (state.failed ? '导入失败' : '导入完成') %></button>
+    <span class="span" id="phase"><%= state.running ? (state.tasks.length ? state.tasks[state.tasks.length - 1].label : '解析 XML…') : '' %></span>
+  </div>
+
+  <section class="note <%= state.failed ? 'error' : '' %>" id="note" hidden><%= state.note || '' %></section>
+</main>
+
+<script>
+(function () {
+  var API = '<%= progressApiUrl %>';
+  var rootUrl = '<%= progressUrl %>';
+  var tasksEl = document.getElementById('tasks');
+  var ctlEl = document.getElementById('ctl');
+  var phaseEl = document.getElementById('phase');
+  var noteEl = document.getElementById('note');
+  var stopped = false;
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c];
+    });
+  }
+  function bar(width) {
+    return '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, width)) + '%"></i></div>';
+  }
+  function render(state) {
+    var html = '';
+    (state.tasks || []).forEach(function (task) {
+      if (task.done) html += '<li><span>' + esc(task.label) + '</span><em>完成</em></li>';
+      else html += '<li><span>' + esc(task.label) + '</span>' + bar(task.progress) + '</li>';
+    });
+    if (!html) html = '<li><span>准备中…</span>' + bar(0) + '</li>';
+    tasksEl.innerHTML = html;
+
+    if (state.running) {
+      ctlEl.textContent = '导入中...';
+      ctlEl.className = 'btn';
+      phaseEl.textContent = (state.tasks && state.tasks.length) ? state.tasks[state.tasks.length - 1].label : '解析 XML…';
+      noteEl.hidden = true;
+    } else if (state.failed) {
+      ctlEl.textContent = '导入失败';
+      ctlEl.className = 'btn failed';
+      phaseEl.textContent = '已完成的部分已保留';
+      showNote(state.failed || state.note || '', true);
+      stopped = true;
+    } else {
+      ctlEl.textContent = '导入完成';
+      ctlEl.className = 'btn done';
+      phaseEl.textContent = '';
+      showNote(state.note || '导入完成。请仔细检查各文章是否存在排版问题。', false);
+      stopped = true;
+    }
+  }
+  function showNote(text, error) {
+    noteEl.textContent = text || '';
+    noteEl.className = 'note' + (error ? ' error' : '');
+    noteEl.hidden = false;
+  }
+
+  render(<%- JSON.stringify(state) %>);
+
+  (function poll() {
+    if (stopped) return;
+    fetch(API, { headers: { 'Accept': 'application/json' } })
+      .then(function (response) { return response.json(); })
+      .then(function (data) {
+        if (!data.ok || !data.allowed) { showNote('无法获取进度（会话可能已失效）。', true); stopped = true; return; }
+        render(data.state);
+        if (!data.state.running) return;
+        setTimeout(poll, 1200);
+      })
+      .catch(function () { setTimeout(poll, 2000); });
+  })();
+})();
+</script>
+</body>
+</html>

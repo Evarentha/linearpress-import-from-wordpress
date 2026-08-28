@@ -1,0 +1,63 @@
+<!--
+  Author: MoyuZJ
+  Team: LinearTeam
+  Contact: linearteam@foxmail.com
+  Made by MoyuZJ in China with ♥
+  从 WordPress 导入 · 导入表单页（经插件列表 CustomSetting 进入，不在侧边栏）。
+-->
+<div class="page-head">
+  <h1>从 WordPress 导入</h1>
+  <p class="eyebrow">上传 WordPress 导出的 WXR XML（文章 / 页面 / 媒体 / 作者 / 分类 / 评论 / 站点信息），保留现有、覆盖冲突。</p>
+</div>
+
+<% if (running) { %>
+  <div class="notice notice-ok">已有导入正在进行中。<a href="<%= progressUrl %>">查看导入进度 →</a></div>
+<% } else { %>
+  <% if (notice) { %><p class="notice notice-ok"><%= notice %></p><% } %>
+  <form method="post" action="/admin/import-from-wordpress/import" enctype="multipart/form-data" class="import-form" style="max-width:760px">
+    <section class="group-panel">
+      <div class="group-heading">
+        <div><h2>① 选择导出文件</h2><p class="eyebrow">WordPress 管理后台 → 工具 → 导出 → 全部内容（生成 XML）</p></div>
+      </div>
+      <label class="editor-field">导出 XML 文件
+        <input type="file" name="xml" accept=".xml" required>
+      </label>
+    </section>
+
+    <section class="group-panel">
+      <div class="group-heading"><div><h2>② 导入选项</h2><p class="eyebrow">选项会保存，下次进入时沿用</p></div></div>
+
+      <div class="import-option">
+        <p class="import-label">站点信息（名称 / 大小标题 / 描述 / 网址）</p>
+        <label><input type="radio" name="site_info_mode" value="manual" <%= options.siteInfo ? 'checked' : '' %>> 从导出文件导入站点信息</label>
+        <label><input type="radio" name="site_info_mode" value="auto" <%= !options.siteInfo ? 'checked' : '' %>> 自动配置（不导入站点信息）</label>
+        <% if (siteUrlAuto) { %>
+          <p class="import-hint">当前站点网址为「自动配置」模式，即使开启导入也会自动跳过 XML 中的网址部分，避免域名重定向被改写。</p>
+        <% } %>
+      </div>
+
+      <div class="import-option">
+        <p class="import-label">内容</p>
+        <label class="import-switch"><input type="checkbox" name="import_media" value="1" <%= options.media ? 'checked' : '' %>> 拉取媒体文件并存入媒体库（保留原发布日期）</label>
+        <label class="import-switch"><input type="checkbox" name="import_comments" value="1" <%= options.comments ? 'checked' : '' %>> 导入评论（审核通过的导入为「已通过」，其余为「待审核」）</label>
+        <label class="import-switch"><input type="checkbox" name="import_overwrite" value="1" <%= options.overwrite ? 'checked' : '' %>> 保留现有、覆盖冲突（同一 slug 的文章以导入内容覆盖）</label>
+      </div>
+
+      <p class="notice">依赖提示：媒体拉取依赖「媒体库」插件；分类目录依赖「高级文章列表」；作者个人资料依赖「多彩个人资料」。未安装时对应步骤自动跳过。</p>
+      <p class="notice">耗时说明：导入时间随内容多寡而定，一般在 5 ~ 10 分钟；导入开始后将进入维护模式且无法中止。</p>
+    </section>
+
+    <div style="display:flex;gap:12px;align-items:center">
+      <button type="submit" class="button">开始导入</button>
+      <span class="import-hint">确认后进入维护模式并开始导入，进度仅对此登录会话可见。</span>
+    </div>
+  </form>
+<% } %>
+
+<style>
+  .import-form .import-option { margin: 14px 0; }
+  .import-form .import-label { margin: 0 0 8px; font-weight: 600; }
+  .import-form .import-option label { display: block; margin: 6px 0; cursor: pointer; }
+  .import-form .import-hint { color: #7a7a82; font-size: 13px; margin: 8px 0 0; }
+  .import-form input[type="file"] { padding: 8px 0; }
+</style>
