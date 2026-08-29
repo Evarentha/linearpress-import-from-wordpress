@@ -1,0 +1,26 @@
+{
+  "name": "@evarentha/linearpress-import-from-wordpress",
+  "version": "1.0.0",
+  "private": false,
+  "description": "从 WordPress WXR 导出 XML 导入文章、媒体、用户、分类、评论与站点信息；保留现有数据、覆盖冲突。",
+  "type": "module",
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "plugin.json",
+    "src",
+    "views",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "linearpress",
+    "plugin",
+    "import-from-wordpress"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
