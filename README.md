@@ -48,7 +48,7 @@ Import posts, media, users, categories, comments and site info from a **WordPres
 cd base && sh scripts/sync-plugins.sh import-from-wordpress
 
 # Option 2 — clone into runtime dir（目录名必须等于插件 id）
-git clone https://github.com/Averithen/linearpress-import-from-wordpress src/plugins/import-from-wordpress
+git clone https://github.com/Evarentha/linearpress-import-from-wordpress src/plugins/import-from-wordpress
 ```
 
 ## Optional Dependencies / 依赖插件（可选）
@@ -62,7 +62,7 @@ git clone https://github.com/Averithen/linearpress-import-from-wordpress src/plu
 ## Local Development / 本地开发：怎么拉 / 怎么改 / 怎么跑
 
 ```bash
-git clone https://github.com/Averithen/linearpress-import-from-wordpress LinearPress/Plugins/import-from-wordpress
+git clone https://github.com/Evarentha/linearpress-import-from-wordpress LinearPress/Plugins/import-from-wordpress
 cd LinearPress/base
 npm install && npm run db:init
 sh scripts/sync-plugins.sh import-from-wordpress
