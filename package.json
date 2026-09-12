@@ -1,0 +1,32 @@
+{
+  "name": "@evarentha/linearpress-import-from-wordpress",
+  "version": "3.0.0",
+  "description": "从 WordPress WXR 导出 XML 导入文章、媒体、用户、分类、评论与站点信息；保留现有数据、覆盖冲突。",
+  "type": "module",
+  "main": "index.ts",
+  "license": "GPL-3.0-or-later",
+  "author": "MoyuZJ <moyuzj@moyuzj.cn> (https://moyuzj.cn)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Evarentha/linearpress-import-from-wordpress.git"
+  },
+  "keywords": [
+    "linearpress",
+    "plugin",
+    "evarentha",
+    "import-from-wordpress"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "peerDependencies": {
+    "linearpress": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/Evarentha/linearpress-import-from-wordpress#readme",
+  "bugs": {
+    "url": "https://github.com/Evarentha/linearpress-import-from-wordpress/issues"
+  }
+}
