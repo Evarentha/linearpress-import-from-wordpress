@@ -1,24 +1,37 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * Gutenberg-to-LinearPress Block Converter
+ *
+ * Converts WordPress Gutenberg block markup into LinearPress block structures.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * Gutenberg 区块 → LinearPress 区块转换器。
+ * Gutenberg block → LinearPress block converter.
  *
- * 转换策略（对应导入需求）：
- *  - paragraph → paragraph（纯文本）/ custom-html（含链接等富文本时保留原样）
- *  - heading    → heading（h1-h6 收敛到 LinearPress 支持的 1-3）
- *  - quote      → blockquote（纯文本）/ custom-html（富文本）
- *  - image      → image（src/alt，媒体链接被重写）
- *  - verse      → paragraph（文本）
- *  - 其余（code/html/shortcode/list/gallery/audio/video/mdx 等）→ custom-html 原样保留
- *  - 媒体 URL 重写：导入的媒体库文件替换原 WP 链接（含 -WxH/-scaled 变体）。
+ * Conversion strategy (mapped to the import requirements):
+ * <ul>
+ * <li>paragraph → paragraph (plain text) / custom-html (kept as-is when it contains links or
+ * other rich text)</li>
+ * <li>heading → heading (h1-h6 collapsed to the 1-3 levels LinearPress supports)</li>
+ * <li>quote → blockquote (plain text) / custom-html (rich text)</li>
+ * <li>image → image (src/alt; media links are rewritten)</li>
+ * <li>verse → paragraph (text)</li>
+ * <li>everything else (code/html/shortcode/list/gallery/audio/video/mdx/…) → custom-html kept
+ * as-is</li>
+ * <li>Media URL rewriting: imported media-library files replace the original WP links
+ * (including -WxH/-scaled variants).</li>
+ * </ul>
  *
- * 节点内容用 parts（文本串与子节点交错）保存，序列化时按原顺序还原 HTML，
- * 保留 `<ul>…<li>…</li></ul>` 这类子块嵌入外层标签内部的完整结构。
+ * <p>Node content is kept in parts (text strings interleaved with child nodes) and serialized
+ * back to HTML in the original order, preserving the full structure of nested children such as
+ * `<ul>…<li>…</li></ul>` embedded inside an outer tag.</p>
+ *
+ * @since 1.0.0
  */
 
 import type { Block } from '../../../types/index.js';

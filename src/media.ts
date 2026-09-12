@@ -1,19 +1,31 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress Attachment Media Importer
+ *
+ * Fetches WordPress attachment files and stores them in the LinearPress media library.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * 媒体导入：从 WordPress 站点拉取附件文件，写入媒体库。
+ * Media import: fetch attachment files from the WordPress site and write them into the media
+ * library.
  *
- * - 与媒体库插件（media-library）同构：文件落在 uploads/<kind>s/YYYY/MM/DD/，
- *   URL 为 /media-library/files/<kind>s/YYYY/MM/DD/<name>，并在 media_library
- *   表写入记录（保留原发布日期）。
- * - 不支持的格式（含 SVG）跳过，仅保留原始链接。
- * - 拉取失败（站点下线 / 超时 / 404）跳过，记录失败数，不中断导入。
- * - 映射持久化在基础设施库 ifwp_media_map，重复导入复用已导入媒体。
+ * <ul>
+ * <li>Isomorphic with the media-library plugin: files land in uploads/<kind>s/YYYY/MM/DD/ with
+ * URL /media-library/files/<kind>s/YYYY/MM/DD/<name>, and a media_library record is inserted
+ * (preserving the original publish date).</li>
+ * <li>Unsupported formats (including SVG) are skipped, keeping only the original link.</li>
+ * <li>Fetch failures (site down / timeout / 404) are skipped and counted, without interrupting
+ * the import.</li>
+ * <li>The mapping is persisted in the infrastructure database's ifwp_media_map, so repeated
+ * imports reuse previously imported media.</li>
+ * </ul>
+ *
+ * @since 1.0.0
  */
 
 import crypto from 'node:crypto';

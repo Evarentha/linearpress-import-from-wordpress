@@ -1,8 +1,23 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress Import Route and Permission Constants
+ *
+ * Plugin identity, admin route URLs, and the management permission for the importer.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/**
+ * Shared constants for the import-from-wordpress plugin.
+ *
+ * <p>Defines the plugin identity (must match the plugin directory name and its display name),
+ * the admin routes (import form page, import start, progress page, progress JSON polling API),
+ * and the permission required for management operations.</p>
+ *
+ * @since 1.0.0
  */
 
 /** 插件标识：必须与插件目录名一致。 */

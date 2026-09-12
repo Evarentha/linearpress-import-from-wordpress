@@ -1,21 +1,32 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress Import Options Model
+ *
+ * Import options persisted in the plugin registry, adjustable from the import form at any time.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * 导入选项：持久化在插件配置中（plugins 表 config 列），导入表单可随时调整。
+ * Import options: persisted in the plugin config (the config column of the plugins table); the
+ * import form can adjust them at any time.
  *
- * - siteInfo：导入站点信息（名称 / 副标题 / 描述 / 网址）。
- *   关闭（自动配置）时不导入任何站点信息。
- *   网址（primaryDomain）另有约束：当前站点配置若为“自动配置”（autoDetect），
- *   即使开启 siteInfo 也会跳过 XML 中的网址部分，避免站点域名重定向被改写。
- * - media：拉取并导入媒体文件（依赖 media-library 插件，未安装时自动跳过，
- *   仅保留文章中的原始 WP 媒体链接）。
- * - comments：导入评论（审核通过的导入为“已通过”，其余为“待审核”）。
- * - overwrite：保留现有数据、覆盖冲突（同一 slug 的文章以导入内容覆盖）。
+ * <ul>
+ * <li>siteInfo — import site info (name / subtitle / description / URL). When off (auto mode),
+ * no site info is imported. The URL (primaryDomain) has an extra constraint: if the current site
+ * config is in "auto-detect" mode, the URL part of the XML is skipped even when siteInfo is on,
+ * so the site's domain redirect cannot be rewritten.</li>
+ * <li>media — fetch and import media files (depends on the media-library plugin; auto-skipped
+ * when it is not installed, leaving the original WP media links in posts).</li>
+ * <li>comments — import comments (approved ones become "approved", the rest "pending").</li>
+ * <li>overwrite — keep existing data and overwrite conflicts (posts with the same slug are
+ * overwritten with the imported content).</li>
+ * </ul>
+ *
+ * @since 1.0.0
  */
 export interface ImportOptions {
   siteInfo: boolean;

@@ -1,11 +1,22 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WXR Parser Smoke-Test Script
  *
- * WXR 解析 + 区块转换冒烟脚本（开发用，不参与插件打包语义）。
- * 用法：cd base && npx tsx ../Plugins/import-from-wordpress/scripts/parse-test.ts [xml路径]
+ * Development-only smoke test for WXR parsing and block conversion; not part of the plugin bundle.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/**
+ * Smoke-test script for WXR parsing and block conversion (development use only; plays no part
+ * in the plugin's packaged semantics).
+ *
+ * <p>Usage: cd base && npx tsx ../Plugins/import-from-wordpress/scripts/parse-test.ts [xml-path]</p>
+ *
+ * @since 1.0.0
  */
 
 import fs from 'node:fs';

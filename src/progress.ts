@@ -1,19 +1,29 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * Import Progress Singleton State
+ *
+ * Tracks the single in-flight import's phases, per-task progress, and stats for the initiator.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * 导入进度单例状态。
+ * Singleton state for import progress.
  *
- * 维护模式期间的进度只对发起者会话可见：进度页与轮询接口均校验
- * initiatorSessionId，其它访客只会看到普通维护首页。
+ * <p>During maintenance mode the progress is visible only to the initiating session: both the
+ * progress page and the polling API check initiatorSessionId, so every other visitor just sees
+ * the ordinary maintenance home page.</p>
  *
- * 任务展示：
- *  - 运行中：「正在导入媒体 (27/196)」
- *  - 已完成：「已导入媒体 (137/137)」
+ * Task display:
+ * <ul>
+ * <li>While running: "正在导入媒体 (27/196)" (importing media 27/196).</li>
+ * <li>When finished: "已导入媒体 (137/137)" (media imported 137/137).</li>
+ * </ul>
+ *
+ * @since 1.0.0
  */
 
 export type ImportPhase = 'parse' | 'media' | 'categories' | 'users' | 'posts' | 'comments' | 'site' | 'profiles' | 'done' | 'failed';

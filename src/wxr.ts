@@ -1,15 +1,23 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress WXR XML Parser
+ *
+ * Parses WordPress WXR (eXtended RSS) export XML with zero third-party dependencies.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * WordPress WXR (eXtended RSS) 导出 XML 解析器。
+ * WordPress WXR (eXtended RSS) export XML parser.
  *
- * 无第三方依赖：WXR 是受控格式（CDATA 转义由 WP 导出器保证），使用
- * 逐标签定位 + CDATA 提取即可可靠解析，且能容忍标签顺序与空白差异。
+ * <p>No third-party dependencies: WXR is a controlled format (CDATA escaping is guaranteed by
+ * the WP exporter), so tag-by-tag locating + CDATA extraction parses it reliably while
+ * tolerating differences in tag order and whitespace.</p>
+ *
+ * @since 1.0.0
  */
 
 export interface WxrAuthor {

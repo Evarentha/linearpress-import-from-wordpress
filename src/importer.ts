@@ -1,21 +1,32 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress Import Orchestrator
+ *
+ * Coordinates the phased import of media, categories, users, posts, comments, and site info.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * 导入编排：媒体 → 分类 → 用户（个人资料）→ 文章 → 评论 → 站点信息。
+ * Import orchestration: media → categories → users (profiles) → posts → comments → site info.
  *
- * 特殊维护模式：导入期间进入维护模式（reason=manual），但【不会】调用
- * suspendNonWhitelistedPlugins 禁用任何插件——导入需要与媒体库 / 分类 /
- * 个人资料等插件协作。
+ * <p>Special maintenance mode: during the import the site enters maintenance mode (reason=manual)
+ * but deliberately does NOT call suspendNonWhitelistedPlugins to disable any plugin — the import
+ * needs to cooperate with the media-library / categories / profiles plugins.</p>
  *
- * 数据策略：保留现有、覆盖冲突。
- *  - 文章：同一 slug 已存在则覆盖（标题/内容/状态/作者/浏览量/更新时间）。
- *  - 用户：同用户名（或邮箱）已存在则复用该用户并补充空邮箱，绝不覆盖密码。
- *  - 媒体：ifwp_media_map 命中则复用已导入文件。
+ * Data policy: keep existing data, overwrite conflicts.
+ * <ul>
+ * <li>Posts: if the same slug already exists, overwrite it (title/content/status/author/views/
+ * updated time).</li>
+ * <li>Users: if the same username (or email) already exists, reuse that user and fill in a blank
+ * email; never overwrite passwords.</li>
+ * <li>Media: on an ifwp_media_map hit, reuse the previously imported file.</li>
+ * </ul>
+ *
+ * @since 1.0.0
  */
 
 import crypto from 'node:crypto';

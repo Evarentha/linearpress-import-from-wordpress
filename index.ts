@@ -1,23 +1,33 @@
 /*
- * Author: MoyuZJ
- * Team: LinearTeam
- * Contact: linearteam@foxmail.com
- * Made by MoyuZJ in China with ♥
+ * WordPress Import Plugin Entry Point
+ *
+ * Cordis plugin that imports a WordPress WXR export into LinearPress.
+ *
+ * Authors:
+ * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ *
+ * Copyright (C) 2026 Evarentha
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 /**
- * 从 WordPress 导入（import-from-wordpress）。
+ * Import from WordPress (import-from-wordpress).
  *
- * 入口：插件列表 →「从 WordPress 导入」（CustomSetting 按钮）→ 导入页「导入 XML」。
- * 导入页本身不出现在侧边栏。
+ * <p>Entry point: plugin list → "从 WordPress 导入" (CustomSetting button) → import page →
+ * "导入 XML" (import XML). The import page itself never appears in the admin sidebar.</p>
  *
- * 导入流程：
- *  1. 上传并解析 WXR 导出 XML（multipart，无第三方解析依赖）；
- *  2. 进入特殊维护模式（不卸载/禁用任何插件，导入需要与媒体库 / 分类 /
- *     个人资料等插件协作）；
- *  3. 后台按 媒体 → 分类 → 用户（个人资料）→ 文章 → 评论 → 站点信息 顺序导入，
- *     保留现有、覆盖冲突；
- *  4. 进度只对发起者会话可见（progress 页 + JSON 轮询），其余访客看到普通维护首页。
+ * Import flow:
+ * <ul>
+ * <li>Upload and parse the WXR export XML (multipart, no third-party parsing dependency).</li>
+ * <li>Enter a special maintenance mode — no plugin is unloaded or disabled, because the import
+ * cooperates with the media-library / categories / profiles plugins.</li>
+ * <li>Import in the background in the order media → categories → users (profiles) → posts →
+ * comments → site info, keeping existing data and overwriting conflicts.</li>
+ * <li>Progress is visible only to the initiating session (progress page + JSON polling); all
+ * other visitors see the ordinary maintenance home page.</li>
+ * </ul>
+ *
+ * @since 1.0.0
  */
 
 import type { Context } from 'cordis';

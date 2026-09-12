@@ -1,9 +1,19 @@
 <!--
-  Author: MoyuZJ
-  Team: LinearTeam
-  Contact: linearteam@foxmail.com
-  Made by MoyuZJ in China with ♥
-  从 WordPress 导入 · 导入进度页（仅发起者会话可见；其余访客看到普通维护首页）。
+  WordPress Import Progress View
+  Initiator-only progress page with live task bars and JSON polling during import.
+
+  Authors:
+  MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+
+  Copyright (C) 2026 Evarentha
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
+<!--
+  Import-from-WordPress import progress page, visible only to the initiating
+  session; all other visitors see the ordinary maintenance home page.
+
+  @since 1.0.0
 -->
 <% layout = false %><!doctype html>
 <html lang="zh-CN">
@@ -114,7 +124,7 @@
     noteEl.hidden = false;
   }
 
-  render(<%- JSON.stringify(state) %>);
+  render(<%- JSON.stringify(state).replace(/</g, '\\u003c') %>);
 
   (function poll() {
     if (stopped) return;
