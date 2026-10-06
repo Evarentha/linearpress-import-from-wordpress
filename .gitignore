@@ -1,4 +1,8 @@
 # Node / 构建产物
+# Local documentation (kept on disk, not committed)
+doc/
+docs/
+
 node_modules/
 dist/
 *.tsbuildinfo
