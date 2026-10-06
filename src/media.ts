@@ -5,6 +5,7 @@
  *
  * Authors:
  * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ * worryzu <worryzu@gmail.com> @LinearTeam
  *
  * Copyright (C) 2026 Evarentha
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -29,6 +30,7 @@
  */
 
 import crypto from 'node:crypto';
+import { downloadPublic as download } from './safe-download.js';
 import fs from 'fs-extra';
 import path from 'node:path';
 import type { SqliteDatabase } from '../../../core/database.js';
@@ -52,8 +54,6 @@ const MIME_BY_EXT: Record<string, string> = {
 };
 
 const MEDIA_PATH = '/media-library/files';
-const FETCH_TIMEOUT_MS = 30_000;
-const MAX_MEDIA_BYTES = 256 * 1024 * 1024;
 /** 同时拉取的文件数（受限并发，平衡总耗时与内存占用）。 */
 const DOWNLOAD_CONCURRENCY = 4;
 
@@ -103,24 +103,6 @@ function tryDecode(url: string): string {
 function dateParts(wpDate: string): { year: string; month: string; day: string } {
   const m = wpDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? { year: m[1], month: m[2], day: m[3] } : { year: '', month: '', day: '' };
-}
-
-async function download(url: string): Promise<{ data: Buffer; mimeType: string }> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    const response = await fetch(url, { signal: controller.signal, redirect: 'follow' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const length = Number(response.headers.get('content-length') ?? 0);
-    if (length > MAX_MEDIA_BYTES) throw new Error('文件过大');
-    const buffer = Buffer.from(await response.arrayBuffer());
-    if (!buffer.length) throw new Error('空文件');
-    if (buffer.length > MAX_MEDIA_BYTES) throw new Error('文件过大');
-    const mimeType = (response.headers.get('content-type') ?? '').split(';')[0]?.trim() || 'application/octet-stream';
-    return { data: buffer, mimeType };
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 export async function ensureMediaSchema(database: DatabaseService): Promise<void> {

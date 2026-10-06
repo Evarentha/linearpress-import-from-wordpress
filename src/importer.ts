@@ -5,6 +5,7 @@
  *
  * Authors:
  * MoyuZJ <moyuzj@moyuzj.cn> @LinearTeam - Made in China with ♥
+ * worryzu <worryzu@gmail.com> @LinearTeam
  *
  * Copyright (C) 2026 Evarentha
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -30,6 +31,7 @@
  */
 
 import crypto from 'node:crypto';
+import { ensureCommentMap, importComment } from './comments.js';
 import path from 'node:path';
 import bcrypt from 'bcryptjs';
 import type { Context } from 'cordis';
@@ -53,6 +55,7 @@ const UPLOAD_ROOT = path.join(process.cwd(), 'uploads');
 const SUBSCRIBER_GROUP = 'subscriber';
 
 interface PendingComment {
+  wpPostId: number;
   postId: number;
   comment: WxrComment;
 }
@@ -161,7 +164,7 @@ async function runImport(ctx: Context, options: ImportOptions, parsed: WxrExport
       const names = [...new Set(parsed.categories.map((cat) => cat.name).filter(Boolean))];
       setPhase('categories', names.length, '分类目录');
       for (const name of names) {
-        const existing = infra.prepare('SELECT id FROM apl_categories WHERE name=? COLLATE NOCASE').get(name) as { id: number } | undefined;
+        const existing = await db.get<{id: number}>('SELECT id FROM apl_categories WHERE name=? COLLATE NOCASE', name);
         if (existing) {
           categoryIdByName.set(name, existing.id);
           advance();
@@ -169,9 +172,8 @@ async function runImport(ctx: Context, options: ImportOptions, parsed: WxrExport
         }
         let slug = generateSlug(name) || 'category';
         let suffix = 2;
-        const slugExists = infra.prepare('SELECT id FROM apl_categories WHERE slug=?');
-        while (slugExists.get(slug)) slug = `${generateSlug(name) || 'category'}-${suffix++}`;
-        const result = infra.prepare('INSERT INTO apl_categories(name, slug) VALUES(?,?)').run(name, slug);
+        while (await db.get('SELECT id FROM apl_categories WHERE slug=?', slug)) slug = `${generateSlug(name) || 'category'}-${suffix++}`;
+        const result = await db.run('INSERT INTO apl_categories(name, slug) VALUES(?,?)', name, slug);
         categoryIdByName.set(name, Number(result.lastInsertRowid));
         addStat('categories');
         advance();
@@ -269,21 +271,20 @@ async function runImport(ctx: Context, options: ImportOptions, parsed: WxrExport
       if (aplEnabled) {
         const categoryNames = item.categories.filter((cat) => cat.domain === 'category').map((cat) => cat.name).filter(Boolean);
         if (categoryNames.length) {
-          infra.prepare('DELETE FROM apl_post_categories WHERE post_id=?').run(lpId);
-          const assign = infra.prepare('INSERT OR IGNORE INTO apl_post_categories(post_id,category_id) VALUES(?,?)');
+          await db.run('DELETE FROM apl_post_categories WHERE post_id=?', lpId);
           for (const name of categoryNames) {
             const categoryId = categoryIdByName.get(name);
-            if (categoryId !== undefined) assign.run(lpId, categoryId);
+            if (categoryId !== undefined) await db.run('INSERT OR IGNORE INTO apl_post_categories(post_id,category_id) VALUES(?,?)', lpId, categoryId);
           }
         }
         if (item.isSticky) {
-          infra.prepare('INSERT INTO apl_post_options(post_id,sticky) VALUES(?,1) ON CONFLICT(post_id) DO UPDATE SET sticky=1').run(lpId);
+          await db.run('INSERT INTO apl_post_options(post_id,sticky) VALUES(?,1) ON CONFLICT(post_id) DO UPDATE SET sticky=1', lpId);
         }
       }
 
       for (const comment of item.comments) {
         if (!comment.content.trim()) continue;
-        pendingComments.push({ postId: lpId, comment });
+        pendingComments.push({ wpPostId: item.postId, postId: lpId, comment });
       }
       advance();
     }
@@ -292,14 +293,10 @@ async function runImport(ctx: Context, options: ImportOptions, parsed: WxrExport
     // ---------------- 5. 评论 ----------------
     if (options.comments && pendingComments.length) {
       setPhase('comments', pendingComments.length, '评论');
-      for (const { postId, comment } of pendingComments) {
-        const approved = comment.approved === '1' || comment.approved.toLowerCase() === 'approved';
+      await ensureCommentMap(db);
+      for (const { wpPostId, postId, comment } of pendingComments) {
         const userId = comment.userId ? userByWpId.get(comment.userId) ?? null : null;
-        await db.run(
-          'INSERT INTO comments(post_id,user_id,guest_name,guest_email,content,status,ip,created_at) VALUES(?,?,?,?,?,?,?,?)',
-          postId, userId, comment.author.trim() || null, comment.authorEmail.trim() || null, comment.content, approved ? 'approved' : 'pending', comment.authorIp || null,
-          normalizeWpDate(comment.date) || now
-        );
+        await importComment(db, parsed.baseBlogUrl || parsed.baseSiteUrl || parsed.link, wpPostId, postId, comment, userId, normalizeWpDate(comment.date) || now);
         addStat('comments');
         advance();
       }
